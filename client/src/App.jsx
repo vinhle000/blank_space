@@ -9,28 +9,38 @@ function App() {
   const [receivedMessages, setReceivedMessages] = useState([]);
 
   useEffect(() => {
-    // socket = io('http://localhost:4001');
+   socket = io("http://localhost:4001", {
+  withCredentials: true,
+  extraHeaders: {
+    "my-custom-header": "abcd"
+  }
+});
+    socket.on('message', (message) => {
+      setReceivedMessages((prevMessages) => [...prevMessages, message]);
+      console.log('RECEIVED MESSAGE: ', receivedMessages)
+    });
 
-    // socket.on('message', (message) => {
-    //   setReceivedMessages((prevMessages) => [...prevMessages, message]);
-    // });
-
-    // return () => {
-    //   socket.disconnect();
-    // };
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const sendMessage = () => {
-    // socket.emit('message', message);
-    // setMessage("");
-    axios.get('http://localhost:4001/')
-  .then(response => {
-    console.log(response.data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    console.log('SENDING MESSAGE: ', message)
+    socket.emit('message', message);
+    setMessage("");
   };
+
+
+  // const testGetEndpoint = () => { //
+  //   axios.get('http://localhost:4002/')
+  // .then(response => {
+  //   console.log(response.data);
+  // })
+  // .catch(error => {
+  //   console.error(error);
+  // });
+  // };
 
   return (
     <div className="App">
@@ -39,6 +49,7 @@ function App() {
         onChange={(e) => setMessage(e.target.value)}
       />
       <button onClick={sendMessage}>Send</button>
+      {/* <button onClick={testGetEndpoint}>TestEndpoint</button> */}
 
       <ul>
         {receivedMessages.map((msg, i) => <li key={i}>{msg}</li>)}

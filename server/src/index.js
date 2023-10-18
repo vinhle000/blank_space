@@ -21,35 +21,49 @@ const cors = require('cors');
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
+
+// app.use(cors({
+//   origin: 'http://localhost:5173'
+// }));
 
 // Add middleware to set the Access-Control-Allow-Origin header
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  next();
-});
-
-app.get('/', (req, res) => {
-  console.log('hello');
-});
-
-app.listen(4001, () => console.log(`Listening on port 4001`));
-// const server = http.createServer(app);
-// const io = socketIo(server);
-
-// io.use(cors());
-
-// io.on('connection', (socket) => {
-//   console.log('New client connected');
-
-//   socket.on('message', (message) => {
-//     io.emit('message', message);
-//   });
-
-//   socket.on('disconnect', () => {
-//     console.log('Client disconnected');
-//   });
+// app.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//   next();
 // });
 
-// const port = 4001;
-// server.listen(port, () => console.log(`Listening on port ${port}`));
+// app.get('/', (req, res) => {
+//   console.log('hello');
+// });
+
+// app.listen(4002, () => console.log(`Listening on port 4002`));
+const server = http.createServer(app);
+// const io = socketIo(server);
+
+
+
+  const io = require("socket.io")(server, {
+    cors: {
+      origin: "http://localhost:5173",
+      methods: ["GET", "POST"],
+      allowedHeaders: ["my-custom-header"],
+    credentials: true
+    }
+  });
+
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('message', (message) => {
+    console.log('WORKING')
+    io.emit('message', message);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
+
+const port = 4001;
+server.listen(port, () => console.log(`Listening on port ${port}`));
